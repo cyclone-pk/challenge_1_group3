@@ -11,7 +11,12 @@ class BoardProvider with ChangeNotifier {
 
   void addBoard(BoardModel board) {
     boards.add(board);
-    columnsMap[board.id] = [];
+    columnsMap[board.id] = [
+      BoardColumnModel(id: 'todo', title: 'To Do', cards: []),
+      BoardColumnModel(id: 'doing', title: 'Doing', cards: []),
+      BoardColumnModel(id: 'done', title: 'Done', cards: []),
+    ];
+
     notifyListeners();
   }
 
