@@ -10,12 +10,16 @@ class AccountPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final provider = context.watch<BoardProvider>();
     final userId = provider.currentUserId ?? '';
 
     // If not logged in, show the reusable LoginForm widget
     if (userId.isEmpty) {
-      return const LoginForm();
+      return Scaffold(
+        appBar: AppBar(title: const Text('Log In')),
+        body: const LoginForm(),
+      );
     }
 
     final profile = provider.userProfiles[userId]!;
