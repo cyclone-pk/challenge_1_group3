@@ -19,7 +19,7 @@ class BoardProvider with ChangeNotifier {
 
     notifyListeners();
   }
-
+  toggling task status
   void removeBoard(String boardId) {
     boards.removeWhere((b) => b.id == boardId);
     columnsMap.remove(boardId);
@@ -53,6 +53,34 @@ class BoardProvider with ChangeNotifier {
     notifyListeners();
   }
 
+
+  void updateCard(String boardId, String columnId, TaskCardModel updatedCard) {
+    final column = _getColumn(boardId, columnId);
+    if (column != null) {
+      final index = column.cards.indexWhere((c) => c.id == updatedCard.id);
+      if (index != -1) {
+        column.cards[index] = updatedCard;
+        notifyListeners();
+      }
+    }
+  }
+
+  void toggleCardDone(String boardId, String columnId, String cardId) {
+    final column = _getColumn(boardId, columnId);
+    if (column != null) {
+      final index = column.cards.indexWhere((c) => c.id == cardId);
+      if (index != -1) {
+        final card = column.cards[index];
+        final updatedCard = card.copyWith(isDone: !card.isDone);
+        column.cards[index] = updatedCard;
+        notifyListeners();
+      }
+    }
+  }
+
+
+
+
   void removeCard(String boardId, String columnId, String cardId) {
     final column = _getColumn(boardId, columnId);
     column?.cards.removeWhere((c) => c.id == cardId);
@@ -81,4 +109,8 @@ class BoardProvider with ChangeNotifier {
     if (columns == null) return null;
     return columns.firstWhere((c) => c.id == columnId);
   }
+
+
+
+
 }
