@@ -59,17 +59,15 @@ class _BoardPageState extends State<BoardPage> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
+      body: ListView(
         padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            ...updatedColumns.map((column) {
-              return _buildColumn(context, provider, column);
-            }),
-            _buildAddColumnButton(context, provider),
-          ],
-        ),
+        scrollDirection: Axis.horizontal,
+        children: [
+          ...updatedColumns.map((column) {
+            return _buildColumn(context, provider, column);
+          }),
+          _buildAddColumnButton(context, provider),
+        ],
       ),
     );
   }
@@ -86,7 +84,6 @@ class _BoardPageState extends State<BoardPage> {
     return Container(
       width: 260,
       margin: const EdgeInsets.only(right: 6),
-      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.grey[200],
         borderRadius: BorderRadius.circular(8),
@@ -94,42 +91,55 @@ class _BoardPageState extends State<BoardPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(column.title,
-              style:
-                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(column.title,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ),
+          Divider(
+            height: 1,
+          ),
+          SizedBox(height: 8),
+          ...filteredCards.map((task) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: TaskTile(
+                    task: task,
+                    showDetail: () {
+                      showEditCardDialog(
+                        context: context,
+                        provider: provider,
+                        boardId: widget.board.id,
+                        columnId: column.id,
+                        card: task,
+                      );
+                    },
+                    onComplete: () {
+                      provider.toggleCardDone(
+                          widget.board.id, column.id, task.id);
+                    }),
+              )),
           const SizedBox(height: 8),
-          ...filteredCards.map((task) => TaskTile(
-              task: task,
-              showDetail: () {
-                showEditCardDialog(
-                  context: context,
-                  provider: provider,
-                  boardId: widget.board.id,
-                  columnId: column.id,
-                  card: task,
-                );
-              },
-              onComplete: () {
-                provider.toggleCardDone(widget.board.id, column.id, task.id);
-              })),
-          const SizedBox(height: 8),
-          InkWell(
-            onTap: () => _addTask(context, provider, column.id),
-            child: Container(
-              child: Row(
-                children: [
-                  Icon(Icons.add),
-                  SizedBox(
-                    width: 8,
-                  ),
-                  Expanded(
-                    child: Text(
-                      "Add New Card",
-                      style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: InkWell(
+              onTap: () => _addTask(context, provider, column.id),
+              child: Container(
+                child: Row(
+                  children: [
+                    Icon(Icons.add),
+                    SizedBox(
+                      width: 8,
                     ),
-                  ),
-                ],
+                    Expanded(
+                      child: Text(
+                        "Add New Card",
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
