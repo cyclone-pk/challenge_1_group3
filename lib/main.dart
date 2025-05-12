@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [ChangeNotifierProvider(create: (context) => BoardProvider())],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         home: const HomePage(),
       ),
     );
