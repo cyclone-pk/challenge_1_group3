@@ -103,4 +103,5 @@ class BoardProvider with ChangeNotifier {
     if (columns == null) return null;
     return columns.firstWhere((c) => c.id == columnId);
   }
+
 }
