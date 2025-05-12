@@ -2,7 +2,6 @@ import 'package:challenge1_group3/models/board_column_model.dart';
 import 'package:challenge1_group3/models/board_model.dart';
 import 'package:challenge1_group3/models/task_card_model.dart';
 import 'package:flutter/cupertino.dart';
-
 import 'package:flutter/material.dart';
 
 class BoardProvider with ChangeNotifier {
@@ -27,6 +26,7 @@ class BoardProvider with ChangeNotifier {
   }
 
   BoardModel? getBoardById(String id) => boards.firstWhere((b) => b.id == id);
+  List<BoardModel> get getMyBoards => boards;
 
   void addColumn(String boardId, BoardColumnModel column) {
     final columns = columnsMap[boardId];
@@ -44,8 +44,7 @@ class BoardProvider with ChangeNotifier {
     }
   }
 
-  List<BoardColumnModel> getColumns(String boardId) =>
-      columnsMap[boardId] ?? [];
+  List<BoardColumnModel> getColumns(String boardId) => columnsMap[boardId] ?? [];
 
   void addCard(String boardId, String columnId, TaskCardModel card) {
     final column = _getColumn(boardId, columnId);

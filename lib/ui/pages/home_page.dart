@@ -1,12 +1,62 @@
 import 'package:challenge1_group3/models/board_model.dart';
 import 'package:challenge1_group3/provider/board_provider.dart';
+import 'package:challenge1_group3/ui/pages/account_page.dart';
+import 'package:challenge1_group3/ui/pages/activity_page.dart';
 import 'package:challenge1_group3/ui/pages/board_page.dart';
+import 'package:challenge1_group3/ui/pages/inbox_page.dart';
 import 'package:challenge1_group3/ui/widgets/board_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
+  final List<Widget> _pages = const [
+    BoardCardsView(),
+    InboxPage(),
+    ActivityPage(),
+    AccountPage(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _pages[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard),
+            label: 'Boards',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.inbox),
+            label: 'Inbox',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.history),
+            label: 'Activity',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Account',
+          ),
+        ],
+        onTap: (index) => setState(() => _currentIndex = index),
+      ),
+    );
+  }
+}
+
+class BoardCardsView extends StatelessWidget {
+  const BoardCardsView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +76,7 @@ class HomePage extends StatelessWidget {
                 return BoardTile(
                   board: board,
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => BoardPage(board: board)));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => BoardPage(board: board)));
                   },
                 );
               },
@@ -49,8 +96,7 @@ class HomePage extends StatelessWidget {
     showDialog(
         context: context,
         builder: (_) => AlertDialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               backgroundColor: Colors.white,
               title: const Text('Create Board'),
               content: Form(
@@ -61,8 +107,7 @@ class HomePage extends StatelessWidget {
                     return null;
                   },
                   controller: nameController,
-                  decoration: const InputDecoration(
-                      hintText: 'Board name', border: OutlineInputBorder()),
+                  decoration: const InputDecoration(hintText: 'Board name', border: OutlineInputBorder()),
                 ),
               ),
               actions: [
@@ -76,15 +121,13 @@ class HomePage extends StatelessWidget {
                     if (!_formKey.currentState!.validate()) return;
                     final name = nameController.text.trim();
                     if (name.isNotEmpty) {
-                      final id =
-                          DateTime.now().millisecondsSinceEpoch.toString();
+                      final id = DateTime.now().millisecondsSinceEpoch.toString();
                       final board = BoardModel(
                         id: id,
                         name: name,
                         createdAt: DateTime.now(),
                       );
-                      Provider.of<BoardProvider>(context, listen: false)
-                          .addBoard(board);
+                      Provider.of<BoardProvider>(context, listen: false).addBoard(board);
                     }
                     Navigator.pop(context);
                   },

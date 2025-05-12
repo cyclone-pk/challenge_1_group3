@@ -29,4 +29,18 @@ class UserModel {
       'profile_pic': profilePic,
     };
   }
+
+  UserModel copyWith({
+    String? uid,
+    String? fullName,
+    String? profilePic,
+    String? email,
+  }) {
+    return UserModel(
+      uid: uid ?? this.uid,
+      fullName: fullName ?? this.fullName,
+      profilePic: profilePic ?? this.profilePic,
+      email: email ?? this.email,
+    );
+  }
 }
