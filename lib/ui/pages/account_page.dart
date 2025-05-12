@@ -1,5 +1,6 @@
 import 'package:challenge1_group3/provider/board_provider.dart';
 import 'package:challenge1_group3/provider/user_provider.dart';
+import 'package:challenge1_group3/ui/pages/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -35,7 +36,8 @@ class AccountPage extends StatelessWidget {
                     context,
                     'Full Name',
                     user!.fullName,
-                    (val) => userProvider.updateUser(user.copyWith(fullName: val)),
+                    (val) =>
+                        userProvider.updateUser(user.copyWith(fullName: val)),
                   ),
                 ),
               ],
@@ -106,7 +108,11 @@ class AccountPage extends StatelessWidget {
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ElevatedButton.icon(
-          onPressed: () => userProvider.updateUser(null),
+          onPressed: () {
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => LoginScreen()));
+            userProvider.updateUser(null);
+          },
           icon: const Icon(Icons.logout),
           label: const Text('Log Out'),
           style: ElevatedButton.styleFrom(
