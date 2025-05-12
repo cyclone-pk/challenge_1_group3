@@ -2,6 +2,7 @@
 import 'package:challenge1_group3/models/user_model.dart';
 import 'package:challenge1_group3/provider/board_provider.dart';
 import 'package:challenge1_group3/provider/user_provider.dart';
+import 'package:challenge1_group3/ui/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -31,9 +32,9 @@ class _LoginFormState extends State<LoginForm> {
     final p = _passwordController.text.trim();
 
     if ((u == 'username1' && p == 'password1') || (u == 'username2' && p == 'password2')) {
-      // Persist and notify listeners
       await context.read<UserProvider>().updateUser(UserModel(uid: "uid", fullName: "Zakria khan", email: "contact@zakriakhan.com", profilePic: ""));
       setState(() => _error = null);
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomePage()));
     } else {
       setState(() => _error = 'Invalid username or password');
     }

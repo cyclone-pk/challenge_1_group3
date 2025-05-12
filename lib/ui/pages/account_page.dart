@@ -1,6 +1,5 @@
 import 'package:challenge1_group3/provider/board_provider.dart';
 import 'package:challenge1_group3/provider/user_provider.dart';
-import 'package:challenge1_group3/ui/pages/login_form.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,13 +10,6 @@ class AccountPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final userProvider = context.watch<UserProvider>();
     final boardProvider = context.watch<BoardProvider>();
-
-    if (userProvider.currentUser == null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Log In')),
-        body: const LoginForm(),
-      );
-    }
 
     final user = userProvider.currentUser;
 
