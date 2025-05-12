@@ -19,7 +19,7 @@ class BoardProvider with ChangeNotifier {
 
     notifyListeners();
   }
-  toggling task status
+
   void removeBoard(String boardId) {
     boards.removeWhere((b) => b.id == boardId);
     columnsMap.remove(boardId);
@@ -53,7 +53,6 @@ class BoardProvider with ChangeNotifier {
     notifyListeners();
   }
 
-
   void updateCard(String boardId, String columnId, TaskCardModel updatedCard) {
     final column = _getColumn(boardId, columnId);
     if (column != null) {
@@ -77,9 +76,6 @@ class BoardProvider with ChangeNotifier {
       }
     }
   }
-
-
-
 
   void removeCard(String boardId, String columnId, String cardId) {
     final column = _getColumn(boardId, columnId);
@@ -109,8 +105,4 @@ class BoardProvider with ChangeNotifier {
     if (columns == null) return null;
     return columns.firstWhere((c) => c.id == columnId);
   }
-
-
-
-
 }

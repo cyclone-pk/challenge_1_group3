@@ -1,37 +1,38 @@
 import 'package:challenge1_group3/models/board_column_model.dart';
+import 'package:challenge1_group3/models/board_model.dart';
 import 'package:challenge1_group3/models/task_card_model.dart';
 import 'package:challenge1_group3/provider/board_provider.dart';
+import 'package:challenge1_group3/ui/widgets/task_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
 class BoardPage extends StatefulWidget {
-  final String boardId;
+  final BoardModel board;
 
-  const BoardPage({super.key, required this.boardId});
+  const BoardPage({super.key, required this.board});
 
   @override
   State<BoardPage> createState() => _BoardPageState();
 }
 
-class _BoardPageState extends State<BoardPage>  {
+class _BoardPageState extends State<BoardPage> {
   String _searchQuery = '';
 
-  @override
   State<BoardPage> createState() => _BoardPageState();
+  @override
   Widget build(BuildContext context) {
     final provider = Provider.of<BoardProvider>(context);
-    final columns = provider.getColumns(widget.boardId);
-
-    // Initialize default columns if none exist
+    final columns = provider.getColumns(widget.board.id);
     if (columns.isEmpty) {
-      provider.addColumn(widget.boardId, BoardColumnModel(id: 'todo', title: 'To Do'));
       provider.addColumn(
-          widget.boardId, BoardColumnModel(id: 'doing', title: 'Doing'));
-      provider.addColumn(widget.boardId, BoardColumnModel(id: 'done', title: 'Done'));
+          widget.board.id, BoardColumnModel(id: 'todo', title: 'To Do'));
+      provider.addColumn(
+          widget.board.id, BoardColumnModel(id: 'doing', title: 'Doing'));
+      provider.addColumn(
+          widget.board.id, BoardColumnModel(id: 'done', title: 'Done'));
     }
 
-    final updatedColumns = provider.getColumns(widget.boardId);
+    final updatedColumns = provider.getColumns(widget.board.id);
 
     return Scaffold(
       appBar: AppBar(
@@ -44,7 +45,8 @@ class _BoardPageState extends State<BoardPage>  {
               decoration: InputDecoration(
                 hintText: 'search by keyword',
                 prefixIcon: const Icon(Icons.search),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                 filled: true,
                 fillColor: Colors.white,
               ),
@@ -72,64 +74,64 @@ class _BoardPageState extends State<BoardPage>  {
     );
   }
 
-  Widget _buildColumn(BuildContext context, BoardProvider provider, BoardColumnModel column) {
+  Widget _buildColumn(
+      BuildContext context, BoardProvider provider, BoardColumnModel column) {
     final filteredCards = _searchQuery.isEmpty
         ? column.cards
         : column.cards.where((card) {
-      return card.title.toLowerCase().contains(_searchQuery) ||
-          (card.description?.toLowerCase() ?? '').contains(_searchQuery);
-    }).toList();
+            return card.title.toLowerCase().contains(_searchQuery) ||
+                (card.description.toLowerCase() ?? '').contains(_searchQuery);
+          }).toList();
 
     return Container(
       width: 260,
-      margin: const EdgeInsets.only(right: 16),
+      margin: const EdgeInsets.only(right: 6),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(column.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          Text(column.title,
+              style:
+                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          ...filteredCards.map((card) => Card(
-            child: ListTile(
-              leading: Checkbox(
-                value: card.isDone,
-                onChanged: (_) {
-                  provider.toggleCardDone(widget.boardId, column.id, card.id);
-                },
-              ),
-              title: Text(
-                card.title,
-                style: TextStyle(
-                  decoration: card.isDone ? TextDecoration.lineThrough : null,
-                  color: card.isDone ? Colors.grey : Colors.black,
-                ),
-              ),
-              subtitle: Text(
-                card.description,
-                style: TextStyle(
-                  color: card.isDone ? Colors.grey : Colors.black54,
-                ),
-              ),
-              onTap: () {
+          ...filteredCards.map((task) => TaskTile(
+              task: task,
+              showDetail: () {
                 showEditCardDialog(
                   context: context,
                   provider: provider,
-                  boardId: widget.boardId,
+                  boardId: widget.board.id,
                   columnId: column.id,
-                  card: card,
+                  card: task,
                 );
               },
-            ),
-          )),
+              onComplete: () {
+                provider.toggleCardDone(widget.board.id, column.id, task.id);
+              })),
           const SizedBox(height: 8),
-          ElevatedButton.icon(
-            onPressed: () => _addTask(context, provider, column.id),
-            icon: const Icon(Icons.add),
-            label: const Text('Add Card'),
+          InkWell(
+            onTap: () => _addTask(context, provider, column.id),
+            child: Container(
+              child: Row(
+                children: [
+                  Icon(Icons.add),
+                  SizedBox(
+                    width: 8,
+                  ),
+                  Expanded(
+                    child: Text(
+                      "Add New Card",
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -161,7 +163,7 @@ class _BoardPageState extends State<BoardPage>  {
                       title: name,
                       cards: [],
                     );
-                    provider.addColumn(widget.boardId, newCol);
+                    provider.addColumn(widget.board.id, newCol);
                   }
                   Navigator.pop(context);
                 },
@@ -191,27 +193,33 @@ class _BoardPageState extends State<BoardPage>  {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        backgroundColor: Colors.white,
         title: const Text('New Task'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: titleController,
-              decoration: const InputDecoration(hintText: 'Task title'),
+              decoration: const InputDecoration(
+                  hintText: 'Task title', border: OutlineInputBorder()),
             ),
             const SizedBox(height: 8),
             TextField(
               controller: descriptionController,
-              decoration: const InputDecoration(hintText: 'Instruction / Description'),
+              decoration: const InputDecoration(
+                  hintText: 'Instruction / Description',
+                  border: OutlineInputBorder()),
               maxLines: 3,
             ),
           ],
         ),
         actions: [
-          TextButton(
+          MaterialButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('Cancel')),
-          ElevatedButton(
+          MaterialButton(
+            color: Colors.green,
             onPressed: () {
               final title = titleController.text.trim();
               final description = descriptionController.text.trim();
@@ -221,12 +229,16 @@ class _BoardPageState extends State<BoardPage>  {
                   title: title,
                   description: description,
                   isDone: false,
+                  createdAt: DateTime.now(),
                 );
-                provider.addCard(widget.boardId, columnId, card);
+                provider.addCard(widget.board.id, columnId, card);
               }
               Navigator.pop(context);
             },
-            child: const Text('Add'),
+            child: const Text(
+              'Add',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ],
       ),
@@ -292,6 +304,7 @@ class _BoardPageState extends State<BoardPage>  {
                       title: titleController.text.trim(),
                       description: descController.text.trim(),
                       isDone: isDone,
+                      createdAt: DateTime.now(),
                     );
                     provider.updateCard(boardId, columnId, updatedCard);
                     Navigator.pop(context);
@@ -305,5 +318,4 @@ class _BoardPageState extends State<BoardPage>  {
       },
     );
   }
-
 }
