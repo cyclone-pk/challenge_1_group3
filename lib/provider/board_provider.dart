@@ -87,15 +87,14 @@ class BoardProvider with ChangeNotifier {
     required String boardId,
     required String fromColumnId,
     required String toColumnId,
-    required TaskCardModel card,
-    required int toIndex,
+    required TaskCardModel task,
   }) {
     final fromColumn = _getColumn(boardId, fromColumnId);
     final toColumn = _getColumn(boardId, toColumnId);
 
     if (fromColumn != null && toColumn != null) {
-      fromColumn.cards.removeWhere((c) => c.id == card.id);
-      toColumn.cards.insert(toIndex, card);
+      fromColumn.cards.removeWhere((c) => c.id == task.id);
+      toColumn.cards.add(task);
       notifyListeners();
     }
   }

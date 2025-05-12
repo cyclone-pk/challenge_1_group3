@@ -81,70 +81,105 @@ class _BoardPageState extends State<BoardPage> {
                 (card.description.toLowerCase() ?? '').contains(_searchQuery);
           }).toList();
 
-    return Container(
-      width: 260,
-      margin: const EdgeInsets.only(right: 6),
-      decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(column.title,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+    return DragTarget<Map<String, dynamic>>(
+      onAcceptWithDetails: (receivedTask) {
+        setState(() {
+          provider.moveCard(
+            boardId: widget.board.id,
+            fromColumnId: receivedTask.data['columnId'],
+            toColumnId: column.id,
+            task: receivedTask.data['task'],
+          );
+        });
+      },
+      builder:
+          (BuildContext context, candidateData, List<dynamic> rejectedData) {
+        return Container(
+          width: 260,
+          margin: const EdgeInsets.only(right: 6),
+          decoration: BoxDecoration(
+            color: Colors.grey[200],
+            borderRadius: BorderRadius.circular(8),
           ),
-          Divider(
-            height: 1,
-          ),
-          SizedBox(height: 8),
-          ...filteredCards.map((task) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: TaskTile(
-                    task: task,
-                    showDetail: () {
-                      showEditCardDialog(
-                        context: context,
-                        provider: provider,
-                        boardId: widget.board.id,
-                        columnId: column.id,
-                        card: task,
-                      );
-                    },
-                    onComplete: () {
-                      provider.toggleCardDone(
-                          widget.board.id, column.id, task.id);
-                    }),
-              )),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: InkWell(
-              onTap: () => _addTask(context, provider, column.id),
-              child: Container(
-                child: Row(
-                  children: [
-                    Icon(Icons.add),
-                    SizedBox(
-                      width: 8,
-                    ),
-                    Expanded(
-                      child: Text(
-                        "Add New Card",
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(column.title,
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
+              ),
+              Divider(
+                height: 1,
+              ),
+              SizedBox(height: 8),
+              if (candidateData.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      Icon(Icons.task_outlined),
+                      SizedBox(
+                        width: 8,
                       ),
+                      Expanded(
+                        child: Text(
+                          "Release To Move Task Here",
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ...filteredCards.map((task) => Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: TaskTile(
+                        task: task,
+                        data: {"task": task, "columnId": column.id},
+                        showDetail: () {
+                          showEditCardDialog(
+                            context: context,
+                            provider: provider,
+                            boardId: widget.board.id,
+                            columnId: column.id,
+                            card: task,
+                          );
+                        },
+                        onComplete: () {
+                          provider.toggleCardDone(
+                              widget.board.id, column.id, task.id);
+                        }),
+                  )),
+              const SizedBox(height: 8),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: InkWell(
+                  onTap: () => _addTask(context, provider, column.id),
+                  child: Container(
+                    child: Row(
+                      children: [
+                        Icon(Icons.add),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Expanded(
+                          child: Text(
+                            "Add New Card",
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
