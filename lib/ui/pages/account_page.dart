@@ -16,93 +16,96 @@ class AccountPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Name (editable)
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Name: ${user!.fullName}',
-                    style: Theme.of(context).textTheme.titleLarge,
+      body: user == null
+          ? SizedBox()
+          : Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Name (editable)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Name: ${user!.fullName}',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () => _showEditDialog(
+                          context,
+                          'Full Name',
+                          user.fullName,
+                          (val) => userProvider
+                              .updateUser(user.copyWith(fullName: val)),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () => _showEditDialog(
-                    context,
-                    'Full Name',
-                    user!.fullName,
-                    (val) =>
-                        userProvider.updateUser(user.copyWith(fullName: val)),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
-            // Username (display only)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Text(
-                'Username: ${user.uid}',
-                style: Theme.of(context).textTheme.bodyMedium,
+                  // Username (display only)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      'Username: ${user.uid}',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+
+                  // Email (editable)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Email: ${user.email}',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () => _showEditDialog(
+                          context,
+                          'Email',
+                          user.email,
+                          (val) => userProvider
+                              .updateUser(user.copyWith(email: val)),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const Divider(height: 32),
+
+                  Text(
+                    'Workspaces',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: boardProvider.getMyBoards.isEmpty
+                        ? const Text('No workspaces yet.')
+                        : ListView.builder(
+                            itemCount: boardProvider.getMyBoards.length,
+                            itemBuilder: (ctx, i) {
+                              final board = boardProvider.getMyBoards[i];
+                              return ListTile(
+                                leading: const Icon(Icons.dashboard_outlined),
+                                title: Text(board.name),
+                                onTap: () => Navigator.pushNamed(
+                                  context,
+                                  '/board',
+                                  arguments: board.id,
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
               ),
             ),
-
-            // Email (editable)
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Email: ${user.email}',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () => _showEditDialog(
-                    context,
-                    'Email',
-                    user.email,
-                    (val) => userProvider.updateUser(user.copyWith(email: val)),
-                  ),
-                ),
-              ],
-            ),
-
-            const Divider(height: 32),
-
-            Text(
-              'Workspaces',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: boardProvider.getMyBoards.isEmpty
-                  ? const Text('No workspaces yet.')
-                  : ListView.builder(
-                      itemCount: boardProvider.getMyBoards.length,
-                      itemBuilder: (ctx, i) {
-                        final board = boardProvider.getMyBoards[i];
-                        return ListTile(
-                          leading: const Icon(Icons.dashboard_outlined),
-                          title: Text(board.name),
-                          onTap: () => Navigator.pushNamed(
-                            context,
-                            '/board',
-                            arguments: board.id,
-                          ),
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
-      ),
 
       // Log Out button at bottom
       bottomNavigationBar: Padding(
