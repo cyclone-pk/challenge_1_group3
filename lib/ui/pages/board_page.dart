@@ -139,12 +139,12 @@ class _BoardPageState extends State<BoardPage> {
                         task: task,
                         data: {"task": task, "columnId": column.id},
                         showDetail: () {
-                          showEditCardDialog(
+                          showCardDetails(
                             context: context,
                             provider: provider,
                             boardId: widget.board.id,
                             columnId: column.id,
-                            card: task,
+                            task: task,
                           );
                         },
                         onComplete: () {
@@ -290,16 +290,14 @@ class _BoardPageState extends State<BoardPage> {
     );
   }
 
-  void showEditCardDialog({
+  void showCardDetails({
     required BuildContext context,
     required BoardProvider provider,
     required String boardId,
     required String columnId,
-    required TaskCardModel card,
+    required TaskCardModel task,
   }) {
-    final titleController = TextEditingController(text: card.title);
-    final descController = TextEditingController(text: card.description ?? '');
-    bool isDone = card.isDone;
+    bool isDone = task.isDone;
 
     showDialog(
       context: context,
@@ -307,56 +305,133 @@ class _BoardPageState extends State<BoardPage> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Edit Task'),
+              titlePadding: EdgeInsets.all(8),
+              contentPadding: EdgeInsets.all(8),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+              title: Text(
+                'Task Details',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
               content: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  TextField(
-                    controller: titleController,
-                    decoration: const InputDecoration(labelText: 'Title'),
+                  Container(
+                    margin: EdgeInsets.symmetric(vertical: 4),
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          spreadRadius: 0.8,
+                          blurRadius: 8,
+                        )
+                      ],
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Text(
+                            task.title,
+                            style: TextStyle(
+                                fontSize: 14, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Divider(height: 1),
+                        if (task.description.isNotEmpty)
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 4, horizontal: 8),
+                            child: Text(
+                              task.description,
+                              style: TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.w400),
+                              maxLines: 3,
+                            ),
+                          ),
+                        Divider(height: 1),
+                        Padding(
+                          padding:
+                              EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                          child: Text(
+                            "created at : ${task.createdAt.toString().split(" ").first}",
+                            style: TextStyle(
+                                fontSize: 10, fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: descController,
-                    decoration: const InputDecoration(labelText: 'Description'),
-                    maxLines: 3,
-                  ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8),
                   Row(
                     children: [
-                      Checkbox(
-                        value: isDone,
-                        onChanged: (val) {
-                          setState(() {
-                            isDone = val ?? false;
-                          });
-                        },
+                      Text("Task is Marked as completed : "),
+                      SizedBox(width: 8),
+                      Icon(
+                        task.isDone
+                            ? Icons.check_box
+                            : Icons.check_box_outline_blank,
+                        size: 20,
                       ),
-                      const Text('Completed'),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  Text("Assigned users"),
+                  Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      CircleAvatar(
+                        radius: 14,
+                        backgroundColor: Colors.green,
+                        child: Center(
+                          child: Text(
+                            "A",
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 20,
+                        child: CircleAvatar(
+                          radius: 14,
+                          backgroundColor: Colors.white,
+                          child: Center(
+                            child: Text(
+                              "B",
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 40,
+                        child: CircleAvatar(
+                          radius: 14,
+                          backgroundColor: Colors.blue,
+                          child: Center(
+                            child: Text(
+                              "C",
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 40,
+                        child: CircleAvatar(
+                          radius: 14,
+                          child: Icon(Icons.add),
+                        ),
+                      )
                     ],
                   )
                 ],
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancel'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    final updatedCard = TaskCardModel(
-                      id: card.id,
-                      title: titleController.text.trim(),
-                      description: descController.text.trim(),
-                      isDone: isDone,
-                      createdAt: DateTime.now(),
-                    );
-                    provider.updateCard(boardId, columnId, updatedCard);
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Save'),
-                ),
-              ],
             );
           },
         );
