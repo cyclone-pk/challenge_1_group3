@@ -1,25 +1,21 @@
-import 'package:challenge1_group3/models/task_card_model.dart';
-
 class BoardColumnModel {
   String id;
+  String boardId;
   String title;
-  List<TaskCardModel> cards;
 
   BoardColumnModel(
-      {required this.id, required this.title, this.cards = const []});
+      {required this.id, required this.title, required this.boardId});
 
   factory BoardColumnModel.fromJson(Map<String, dynamic> json) =>
       BoardColumnModel(
         id: json['id'],
         title: json['title'],
-        cards: (json['cards'] as List)
-            .map((e) => TaskCardModel.fromJson(e))
-            .toList(),
+        boardId: json['board_id'],
       );
 
   Map<String, dynamic> toJson() => {
         'id': id,
         'title': title,
-        'cards': cards.map((e) => e.toJson()).toList(),
+        'board_id': boardId,
       };
 }
