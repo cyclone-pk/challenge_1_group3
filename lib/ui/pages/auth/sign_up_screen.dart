@@ -60,190 +60,209 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          SizedBox(height: 6),
-          Divider(
-            color: CustomTheme.black.withValues(alpha: .2),
-            height: 1,
-          ),
+      body: LayoutBuilder(builder: (context, constraint) {
+        return Row(children: [
+          if (constraint.maxWidth > 600)
+            Expanded(
+                child: Container(
+              color: CustomTheme.accentColor,
+            )),
           Expanded(
-            child: Align(
-              alignment: Alignment.center,
-              child: SingleChildScrollView(
-                padding: EdgeInsets.symmetric(horizontal: 35, vertical: 10),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Create a new account',
-                        style: CustomTextStyle.title16SemiBold,
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      CustomTextField(
-                        required: true,
-                        hintText: 'Full Name',
-                        controller: fullNameController,
-                        verticalPadding: 18,
-                        inputType: TextInputType.text,
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      CustomTextField(
-                        required: true,
-                        hintText: 'Email',
-                        onValidate: (String? v) {
-                          final isValid =
-                              RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$")
-                                  .hasMatch(v!);
+            child: Column(
+              children: [
+                Divider(
+                  color: CustomTheme.black.withValues(alpha: .2),
+                  height: 1,
+                ),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: SingleChildScrollView(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 35, vertical: 10),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Create a new account',
+                              style: CustomTextStyle.title16SemiBold,
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            CustomTextField(
+                              required: true,
+                              hintText: 'Full Name',
+                              controller: fullNameController,
+                              verticalPadding: 18,
+                              inputType: TextInputType.text,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            CustomTextField(
+                              required: true,
+                              hintText: 'Email',
+                              onValidate: (String? v) {
+                                final isValid =
+                                    RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$")
+                                        .hasMatch(v!);
 
-                          if (!isValid) {
-                            return 'Please enter valid email address';
-                          }
-                        },
-                        controller: emailController,
-                        verticalPadding: 18,
-                        inputType: TextInputType.emailAddress,
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Stack(
-                        children: [
-                          CustomTextField(
-                            required: true,
-                            hintText: 'Password',
-                            controller: passwordController,
-                            verticalPadding: 18,
-                            maxLine: 1,
-                            password: password,
-                          ),
-                          Positioned(
-                            right: 0,
-                            bottom: 0,
-                            top: 0,
-                            child: IconButton(
-                                onPressed: () {
-                                  password = !password;
-                                  setState(() {});
-                                },
-                                icon: Icon(password
-                                    ? Icons.visibility_off
-                                    : Icons.visibility)),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      Hero(
-                        tag: "button",
-                        child: PrimaryButton(
-                            label: 'Sign Up',
-                            color: CustomTheme.accentColor,
-                            textColor: CustomTheme.white,
-                            loading: _loading,
-                            onPressed: () async {
-                              if (_formKey.currentState!.validate()) {
-                                setState(() => _loading = true);
-
-                                try {
-                                  // Step 1: Sign up with Firebase Auth
-                                  UserCredential userCredential =
-                                      await FirebaseAuth.instance
-                                          .createUserWithEmailAndPassword(
-                                    email: emailController.text.trim(),
-                                    password: passwordController.text.trim(),
-                                  );
-
-                                  final user = userCredential.user;
-
-                                  if (user != null) {
-                                    await FirebaseFirestore.instance
-                                        .collection('users')
-                                        .doc(user.uid)
-                                        .set({
-                                      'uid': user.uid,
-                                      'full_name':
-                                          fullNameController.text.trim(),
-                                      'email': emailController.text.trim(),
-                                      'createdAt': FieldValue.serverTimestamp(),
-                                    });
-
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: Text(
-                                              'Account created successfully!')),
-                                    );
-
-                                    await FirebaseAuth.instance.signOut();
-                                    await Navigator.pushReplacement(
-                                      navKey.currentContext!,
-                                      MaterialPageRoute(
-                                          builder: (context) => HomePage()),
-                                      result: true,
-                                    );
-                                  }
-                                } on FirebaseAuthException catch (e) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content:
-                                            Text(e.message ?? 'Signup failed')),
-                                  );
-                                } catch (e) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text('Some thing went wrong')),
-                                  );
-                                } finally {
-                                  setState(() => _loading = false);
+                                if (!isValid) {
+                                  return 'Please enter valid email address';
                                 }
-                              }
-                            }),
-                      ),
-                      SizedBox(
-                        height: 15,
-                      ),
-                      Center(
-                        child: RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(children: <TextSpan>[
-                            TextSpan(
-                                text: 'Already have an account? ',
-                                style: CustomTextStyle.title13Regular,
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {}),
-                            TextSpan(
-                                text: 'Sign in',
-                                style: CustomTextStyle.title13Regular.copyWith(
-                                  color: CustomTheme.accentColor,
-                                  fontWeight: FontWeight.w600,
+                              },
+                              controller: emailController,
+                              verticalPadding: 18,
+                              inputType: TextInputType.emailAddress,
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Stack(
+                              children: [
+                                CustomTextField(
+                                  required: true,
+                                  hintText: 'Password',
+                                  controller: passwordController,
+                                  verticalPadding: 18,
+                                  maxLine: 1,
+                                  password: password,
                                 ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                LoginScreen()));
+                                Positioned(
+                                  right: 0,
+                                  bottom: 0,
+                                  top: 0,
+                                  child: IconButton(
+                                      onPressed: () {
+                                        password = !password;
+                                        setState(() {});
+                                      },
+                                      icon: Icon(password
+                                          ? Icons.visibility_off
+                                          : Icons.visibility)),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 20,
+                            ),
+                            Hero(
+                              tag: "button",
+                              child: PrimaryButton(
+                                  label: 'Sign Up',
+                                  color: CustomTheme.accentColor,
+                                  textColor: CustomTheme.white,
+                                  loading: _loading,
+                                  onPressed: () async {
+                                    if (_formKey.currentState!.validate()) {
+                                      setState(() => _loading = true);
+
+                                      try {
+                                        UserCredential userCredential =
+                                            await FirebaseAuth.instance
+                                                .createUserWithEmailAndPassword(
+                                          email: emailController.text.trim(),
+                                          password:
+                                              passwordController.text.trim(),
+                                        );
+
+                                        final user = userCredential.user;
+
+                                        if (user != null) {
+                                          await FirebaseFirestore.instance
+                                              .collection('users')
+                                              .doc(user.uid)
+                                              .set({
+                                            'uid': user.uid,
+                                            'full_name':
+                                                fullNameController.text.trim(),
+                                            'email':
+                                                emailController.text.trim(),
+                                            'createdAt':
+                                                FieldValue.serverTimestamp(),
+                                          });
+
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                                content: Text(
+                                                    'Account created successfully!')),
+                                          );
+
+                                          await FirebaseAuth.instance.signOut();
+                                          await Navigator.pushReplacement(
+                                            navKey.currentContext!,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    HomePage()),
+                                            result: true,
+                                          );
+                                        }
+                                      } on FirebaseAuthException catch (e) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                              content: Text(e.message ??
+                                                  'Signup failed')),
+                                        );
+                                      } catch (e) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                              content: Text(
+                                                  'Some thing went wrong')),
+                                        );
+                                      } finally {
+                                        setState(() => _loading = false);
+                                      }
+                                    }
                                   }),
-                          ]),
+                            ),
+                            SizedBox(
+                              height: 15,
+                            ),
+                            Center(
+                              child: RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(children: <TextSpan>[
+                                  TextSpan(
+                                      text: 'Already have an account? ',
+                                      style: CustomTextStyle.title13Regular,
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () {}),
+                                  TextSpan(
+                                      text: 'Sign in',
+                                      style: CustomTextStyle.title13Regular
+                                          .copyWith(
+                                        color: CustomTheme.accentColor,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () {
+                                          Navigator.pushReplacement(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      LoginScreen()));
+                                        }),
+                                ]),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ),
-        ],
-      ),
+          )
+        ]);
+      }),
     );
   }
 }

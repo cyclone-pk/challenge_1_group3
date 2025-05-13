@@ -97,99 +97,116 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CustomTheme.white,
-      body: Form(
-        key: _formKey,
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Trello Like App",
-                  style: CustomTextStyle.title16SemiBold,
-                ),
-                Text("Developed by Group 3"),
-                const SizedBox(height: 20),
-                Text(
-                  'Login into your account',
-                  style: CustomTextStyle.title16SemiBold,
-                ),
-                const SizedBox(height: 20),
-                CustomTextField(
-                  required: true,
-                  hintText: "Email address",
-                  controller: _usernameController,
-                  onValidate: (String? v) {
-                    final isValid = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$")
-                        .hasMatch(v!);
+      body: LayoutBuilder(builder: (context, constraint) {
+        return Row(
+          children: [
+            if (constraint.maxWidth > 600)
+              Expanded(
+                  child: Container(
+                color: CustomTheme.accentColor,
+              )),
+            Expanded(
+              child: Form(
+                key: _formKey,
+                child: Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Trello Like App",
+                          style: CustomTextStyle.title16SemiBold,
+                        ),
+                        Text("Developed by Group 3"),
+                        const SizedBox(height: 20),
+                        Text(
+                          'Login into your account',
+                          style: CustomTextStyle.title16SemiBold,
+                        ),
+                        const SizedBox(height: 20),
+                        CustomTextField(
+                          required: true,
+                          hintText: "Email address",
+                          controller: _usernameController,
+                          onValidate: (String? v) {
+                            final isValid =
+                                RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$")
+                                    .hasMatch(v!);
 
-                    if (!isValid) {
-                      return 'Please enter a valid email';
-                    }
-                    return null;
-                  },
-                  verticalPadding: 16,
-                  inputType: TextInputType.emailAddress,
-                ),
-                const SizedBox(height: 12),
-                CustomTextField(
-                  required: true,
-                  hintText: "Password",
-                  password: true,
-                  controller: _passwordController,
-                  // onValidate: (v) {},
-                  verticalPadding: 16,
-                ),
-                if (_error != null) ...[
-                  const SizedBox(height: 8),
-                  Text(
-                    _error!,
-                    style: const TextStyle(color: Colors.red),
-                  ),
-                ],
-                const SizedBox(height: 20),
-                SizedBox(
-                    width: double.infinity,
-                    child: PrimaryButton(
-                      label: "Log In",
-                      onPressed: _login,
-                      color: CustomTheme.accentColor,
-                      textColor: CustomTheme.white,
-                      loading: _loading,
-                    )),
-                SizedBox(
-                  height: 15,
-                ),
-                Center(
-                  child: RichText(
-                    textAlign: TextAlign.center,
-                    text: TextSpan(children: <TextSpan>[
-                      TextSpan(
-                          text: 'Don\'t have an account? ',
-                          style: CustomTextStyle.title13Regular,
-                          recognizer: TapGestureRecognizer()..onTap = () {}),
-                      TextSpan(
-                          text: 'Sign up',
-                          style: CustomTextStyle.title13Regular.copyWith(
-                            color: CustomTheme.accentColor,
-                            fontWeight: FontWeight.w600,
+                            if (!isValid) {
+                              return 'Please enter a valid email';
+                            }
+                            return null;
+                          },
+                          verticalPadding: 16,
+                          inputType: TextInputType.emailAddress,
+                        ),
+                        const SizedBox(height: 12),
+                        CustomTextField(
+                          required: true,
+                          hintText: "Password",
+                          password: true,
+                          controller: _passwordController,
+                          // onValidate: (v) {},
+                          verticalPadding: 16,
+                        ),
+                        if (_error != null) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            _error!,
+                            style: const TextStyle(color: Colors.red),
                           ),
-                          recognizer: TapGestureRecognizer()
-                            ..onTap = () async {
-                              await Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => SignUpScreen()));
-                            }),
-                    ]),
+                        ],
+                        const SizedBox(height: 20),
+                        SizedBox(
+                            width: double.infinity,
+                            child: PrimaryButton(
+                              label: "Log In",
+                              onPressed: _login,
+                              color: CustomTheme.accentColor,
+                              textColor: CustomTheme.white,
+                              loading: _loading,
+                            )),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Center(
+                          child: RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(children: <TextSpan>[
+                              TextSpan(
+                                  text: 'Don\'t have an account? ',
+                                  style: CustomTextStyle.title13Regular,
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {}),
+                              TextSpan(
+                                  text: 'Sign up',
+                                  style:
+                                      CustomTextStyle.title13Regular.copyWith(
+                                    color: CustomTheme.accentColor,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () async {
+                                      await Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  SignUpScreen()));
+                                    }),
+                            ]),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
+          ],
+        );
+      }),
     );
   }
 }
