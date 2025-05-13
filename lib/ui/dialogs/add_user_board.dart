@@ -57,6 +57,7 @@ void addUserToBoard(BuildContext context, BoardModel board) async {
       );
     },
   );
+
   if (selectedUser == null) return;
   if (board.members.contains(selectedUser['id'])) {
     ScaffoldMessenger.of(context).showSnackBar(

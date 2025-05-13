@@ -122,6 +122,10 @@ class BoardProvider with ChangeNotifier {
       _boards[index] = board;
       notifyListeners();
     }
+    _firebaseFirestore
+        .collection("boards")
+        .doc(board.id)
+        .update(board.toJson());
   }
 
   void addActivity(Activity activity) {
