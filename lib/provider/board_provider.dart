@@ -69,7 +69,7 @@ class BoardProvider with ChangeNotifier {
 
   void fetchInbox() {
     FirebaseFirestore.instance
-        .collection('inbox')
+        .collection('inboxActivity')
         .where("receiver", arrayContains: UserProvider.currentUserId)
         .orderBy("createdAt", descending: true)
         .snapshots()

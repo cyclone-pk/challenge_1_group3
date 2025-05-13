@@ -2,8 +2,10 @@ import 'package:challenge1_group3/provider/user_provider.dart';
 import 'package:challenge1_group3/styling/custom_theme.dart';
 import 'package:challenge1_group3/styling/text_styles.dart';
 import 'package:challenge1_group3/ui/pages/auth/login_screen.dart';
+import 'package:challenge1_group3/ui/widgets/custom_textfied.dart';
 import 'package:challenge1_group3/ui/widgets/primary_button.dart';
 import 'package:challenge1_group3/ui/widgets/square_button.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -47,11 +49,16 @@ class AccountPage extends StatelessWidget {
                                   contentColor: CustomTheme.white,
                                   onPressed: () {
                                     _showEditDialog(
-                                        context,
-                                        "full name",
-                                        user.fullName,
-                                        (v) => userProvider.updateUser(
-                                            user.copyWith(fullName: v)));
+                                        context, "full name", user.fullName,
+                                        (v) async {
+                                      userProvider.updateUser(
+                                          user.copyWith(fullName: v));
+                                      FirebaseFirestore.instance
+                                          .collection("users")
+                                          .doc(UserProvider.currentUserId)
+                                          .update({"full_name": v});
+                                      return;
+                                    });
                                   })
                             ],
                           ),
@@ -102,23 +109,35 @@ class AccountPage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('Edit $fieldName'),
-        content: TextField(
+        titlePadding: EdgeInsets.all(12),
+        contentPadding: EdgeInsets.all(12),
+        actionsPadding: EdgeInsets.all(12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        backgroundColor: Colors.white,
+        title: Text(
+          'Edit $fieldName',
+          style: CustomTextStyle.title14SemiBold,
+        ),
+        content: CustomTextField(
           controller: ctrl,
-          decoration: InputDecoration(labelText: fieldName),
+          hintText: "Full name",
         ),
         actions: [
-          TextButton(
+          PrimaryButton(
+            color: CustomTheme.red,
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            label: 'Cancel',
+            textColor: CustomTheme.white,
           ),
-          ElevatedButton(
+          PrimaryButton(
+            color: CustomTheme.accentColor,
             onPressed: () async {
               final val = ctrl.text.trim();
               if (val.isNotEmpty) await onSave(val);
               Navigator.pop(context);
             },
-            child: const Text('Save'),
+            label: 'Save',
+            textColor: CustomTheme.white,
           ),
         ],
       ),

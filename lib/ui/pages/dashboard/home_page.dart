@@ -44,6 +44,8 @@ class _HomePageState extends State<HomePage> {
   fetchUserBoards() async {
     BoardProvider provider = context.read<BoardProvider>();
     provider.fetchBoards();
+    provider.fetchActivity();
+    provider.fetchInbox();
   }
 
   @override
