@@ -1,0 +1,2 @@
+C:/Users/anton/second-brain/1-projects/Mobile_Programming/Challenge/challenge1/challenge_1_group3/android/app/.cxx/Debug/5v4c596d/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Users/anton/second-brain/1-projects/Mobile_Programming/Challenge/challenge1/challenge_1_group3/android/app/.cxx/Debug/5v4c596d/armeabi-v7a/CMakeFiles/rebuild_cache.dir
