@@ -277,48 +277,51 @@ class _BoardDetailPageState extends State<BoardDetailPage> {
     required TaskCardModel task,
   }) {
     var users = [];
-    if (task.assignedUser.length > 1) {
-      for (int i = 0; i < task.assignedUser.length; i++) {
+
+    for (int i = 0; i < task.assignedUser.length; i++) {
+      if (i == 0) {
         users.add(Positioned(
-          left: 20,
+          left: 0,
           child: CircleAvatar(
             radius: 14,
             backgroundColor: Colors.white,
             child: Center(
               child: Text(
-                task.assignedUser[i + 1].substring(0, 1),
+                task.assignedUser[i].substring(0, 1),
+                style: TextStyle(fontSize: 12),
+              ),
+            ),
+          ),
+        ));
+      } else {
+        users.add(Positioned(
+          left: (i) * 20,
+          child: CircleAvatar(
+            radius: 14,
+            backgroundColor: Colors.white,
+            child: Center(
+              child: Text(
+                task.assignedUser[i].substring(0, 1),
                 style: TextStyle(fontSize: 12),
               ),
             ),
           ),
         ));
       }
-      users.add(Positioned(
-        left: (task.assignedUser.length - 1) * 20,
-        child: InkWell(
-          onTap: () {
-            assignedUser(context, boardId, columnId, task);
-          },
-          child: CircleAvatar(
-            radius: 14,
-            child: Icon(Icons.add),
-          ),
-        ),
-      ));
-    } else {
-      users.add(Positioned(
-        left: 20,
-        child: InkWell(
-          onTap: () {
-            assignedUser(context, boardId, columnId, task);
-          },
-          child: CircleAvatar(
-            radius: 14,
-            child: Icon(Icons.add),
-          ),
-        ),
-      ));
     }
+
+    users.add(Positioned(
+      left: (task.assignedUser.length) * 20,
+      child: InkWell(
+        onTap: () {
+          assignedUser(context, boardId, columnId, task);
+        },
+        child: CircleAvatar(
+          radius: 14,
+          child: Icon(Icons.add),
+        ),
+      ),
+    ));
 
     showDialog(
       context: context,
@@ -396,16 +399,19 @@ class _BoardDetailPageState extends State<BoardDetailPage> {
                       SizedBox(
                         width: double.infinity,
                       ),
-                      CircleAvatar(
-                        radius: 14,
-                        backgroundColor: Colors.green,
-                        child: Center(
-                          child: Text(
-                            task.assignedUser.first.substring(0, 1),
-                            style: TextStyle(fontSize: 12),
-                          ),
-                        ),
+                      SizedBox(
+                        height: 30,
                       ),
+                      // CircleAvatar(
+                      //   radius: 14,
+                      //   backgroundColor: Colors.green,
+                      //   child: Center(
+                      //     child: Text(
+                      //       task.assignedUser.first.substring(0, 1),
+                      //       style: TextStyle(fontSize: 12),
+                      //     ),
+                      //   ),
+                      // ),
                       ...users,
                     ],
                   )

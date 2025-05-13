@@ -79,5 +79,6 @@ void assignedUser(BuildContext context, String boardId, String columnId,
       columnId,
       updatedTask,
     );
+    Navigator.pop(context);
   }
 }

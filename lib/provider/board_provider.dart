@@ -129,7 +129,6 @@ class BoardProvider with ChangeNotifier {
   }
 
   void addActivity(Activity activity) {
-    _activities.add(activity);
     _firebaseFirestore.collection("activites").add(activity.toJson());
     notifyListeners();
   }
@@ -200,6 +199,10 @@ class BoardProvider with ChangeNotifier {
       _cards[index] = updatedCard;
       notifyListeners();
     }
+    FirebaseFirestore.instance
+        .collection('cards')
+        .doc(updatedCard.id)
+        .update(updatedCard.toJson());
   }
 
   void toggleCardDone(TaskCardModel task) {
