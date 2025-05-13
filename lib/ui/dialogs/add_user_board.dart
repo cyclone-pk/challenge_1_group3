@@ -60,14 +60,18 @@ void addUserToBoard(BuildContext context, BoardModel board) async {
   if (selectedUser == null) return;
   if (board.members.contains(selectedUser['id'])) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('User Already assigned to this card')),
+      SnackBar(content: Text('User Already assigned to this board')),
     );
     return;
   }
 
   if (selectedUser != null && !board.members.contains(selectedUser['id'])) {
+    List<String> updatedMembers = List<String>.from(board.members);
+    if (!updatedMembers.contains(selectedUser['id'])) {
+      updatedMembers.add(selectedUser['id']);
+    }
     final updatedBoard = board.copyWith(
-      members: [...board.members, selectedUser['id']],
+      members: updatedMembers,
     );
 
     Provider.of<BoardProvider>(context, listen: false).addInboxActivity(InboxModel(

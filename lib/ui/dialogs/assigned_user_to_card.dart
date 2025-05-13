@@ -60,24 +60,31 @@ void assignedUser(BuildContext context, String boardId, String columnId,
     return;
   }
 
-  if (selectedUser != null && !task.receiver.contains(selectedUser['id'])) {
-    final updatedTask = task.copyWith(
-      assignedUser: [...task.assignedUser, selectedUser['name']],
-      receiver: [...task.receiver, selectedUser['id']],
-    );
-
-    Provider.of<BoardProvider>(context, listen: false).addInboxActivity(InboxModel(
-        messageId: '',
-        content:
-            "You have been assigned to ${task.title} by ${userProvider.currentUser!.fullName}",
-        sentAt: DateTime.now(),
-        sender: userProvider.currentUser!.uid,
-        receiverId: selectedUser['id'],
-        isRead: false));
-    Provider.of<BoardProvider>(context, listen: false).updateCard(
-      boardId,
-      columnId,
-      updatedTask,
-    );
+  List<String> updatedAssignedUsers = List<String>.from(task.assignedUser);
+  if (!updatedAssignedUsers.contains(selectedUser['name'])) {
+    updatedAssignedUsers.add(selectedUser['name']);
   }
+  List<String> updatedReceivers = List<String>.from(task.receiver);
+  if (!updatedReceivers.contains(selectedUser['id'])) {
+    updatedReceivers.add(selectedUser['id']);
+  }
+
+  final updatedTask = task.copyWith(
+    assignedUser: updatedAssignedUsers,
+    receiver: updatedReceivers,
+  );
+
+  Provider.of<BoardProvider>(context, listen: false).addInboxActivity(InboxModel(
+      messageId: '',
+      content:
+          "You have been assigned to ${task.title} by ${userProvider.currentUser!.fullName}",
+      sentAt: DateTime.now(),
+      sender: userProvider.currentUser!.uid,
+      receiverId: selectedUser['id'],
+      isRead: false));
+  Provider.of<BoardProvider>(context, listen: false).updateCard(
+    boardId,
+    columnId,
+    updatedTask,
+  );
 }

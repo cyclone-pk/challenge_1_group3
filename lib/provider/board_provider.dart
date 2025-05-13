@@ -116,11 +116,15 @@ class BoardProvider with ChangeNotifier {
     });
   }
 
-  void updateBoard(BoardModel board) {
+  void updateBoard(BoardModel board) async {
     final index = _boards.indexWhere((c) => c.id == board.id);
     if (index != -1) {
       _boards[index] = board;
       notifyListeners();
+      await _firebaseFirestore
+          .collection('boards')
+          .doc(board.id)
+          .update(board.toJson());
     }
   }
 

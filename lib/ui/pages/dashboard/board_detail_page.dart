@@ -278,15 +278,15 @@ class _BoardDetailPageState extends State<BoardDetailPage> {
   }) {
     var users = [];
     if (task.assignedUser.length > 1) {
-      for (int i = 0; i < task.assignedUser.length; i++) {
+      for (int i = 1; i < task.assignedUser.length; i++) {
         users.add(Positioned(
-          left: 20,
+          left: 20.0 * i,
           child: CircleAvatar(
             radius: 14,
             backgroundColor: Colors.white,
             child: Center(
               child: Text(
-                task.assignedUser[i + 1].substring(0, 1),
+                task.assignedUser[i].substring(0, 1),
                 style: TextStyle(fontSize: 12),
               ),
             ),
@@ -294,7 +294,7 @@ class _BoardDetailPageState extends State<BoardDetailPage> {
         ));
       }
       users.add(Positioned(
-        left: (task.assignedUser.length - 1) * 20,
+        left: (task.assignedUser.length) * 20.0,
         child: InkWell(
           onTap: () {
             assignedUser(context, boardId, columnId, task);
