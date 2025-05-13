@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 UserProvider userProvider = Provider.of(navKey.currentContext!, listen: false);
+BoardProvider boardProvider =
+    Provider.of(navKey.currentContext!, listen: false);
 
 class BoardProvider with ChangeNotifier {
   FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
@@ -116,13 +118,14 @@ class BoardProvider with ChangeNotifier {
     });
   }
 
-  void updateBoard(BoardModel board) {
+  void updateBoard(BoardModel board) async {
+    print(board.members);
     final index = _boards.indexWhere((c) => c.id == board.id);
     if (index != -1) {
       _boards[index] = board;
       notifyListeners();
     }
-    _firebaseFirestore
+    await _firebaseFirestore
         .collection("boards")
         .doc(board.id)
         .update(board.toJson());

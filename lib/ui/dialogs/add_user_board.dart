@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void addUserToBoard(BuildContext context, BoardModel board) async {
-  List<String> members = board.members;
   final selectedUser = await showDialog(
     context: context,
     builder: (context) {
@@ -66,6 +65,7 @@ void addUserToBoard(BuildContext context, BoardModel board) async {
     return;
   }
 
+  board = boardProvider.getBoardById(board.id) ?? board;
   if (selectedUser != null && !board.members.contains(selectedUser['id'])) {
     final updatedBoard = board.copyWith(
       members: [...board.members, selectedUser['id']],
