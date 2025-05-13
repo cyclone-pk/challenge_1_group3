@@ -194,11 +194,13 @@ class BoardProvider with ChangeNotifier {
         receivedBy: _boards.firstWhere((e) => e.id == task.boardId).members));
   }
 
-  void updateCard(String boardId, String columnId, TaskCardModel updatedCard) {
+  void updateCard(String boardId, String columnId, TaskCardModel updatedCard) async {
     final index = _cards.indexWhere((c) => c.id == updatedCard.id);
     if (index != -1) {
       _cards[index] = updatedCard;
       notifyListeners();
+      // Persist changes to Firestore as well
+      await _firebaseFirestore.collection('cards').doc(updatedCard.id).update(updatedCard.toJson());
     }
   }
 

@@ -87,4 +87,5 @@ void assignedUser(BuildContext context, String boardId, String columnId,
     columnId,
     updatedTask,
   );
+  Provider.of<BoardProvider>(context, listen: false).fetchCards(boardId);
 }

@@ -65,8 +65,9 @@ class _BoardDetailPageState extends State<BoardDetailPage> {
             icon: Icons.add,
             bgColor: CustomTheme.white,
             contentColor: CustomTheme.black,
-            onPressed: () {
+            onPressed: () async {
               addUserToBoard(context, widget.board);
+              Provider.of<BoardProvider>(context, listen: false).fetchBoards();
             },
           ),
           SizedBox(width: 16)
@@ -276,141 +277,143 @@ class _BoardDetailPageState extends State<BoardDetailPage> {
     required String columnId,
     required TaskCardModel task,
   }) {
-    var users = [];
-    if (task.assignedUser.length > 1) {
-      for (int i = 1; i < task.assignedUser.length; i++) {
-        users.add(Positioned(
-          left: 20.0 * i,
-          child: CircleAvatar(
-            radius: 14,
-            backgroundColor: Colors.white,
-            child: Center(
-              child: Text(
-                task.assignedUser[i].substring(0, 1),
-                style: TextStyle(fontSize: 12),
-              ),
-            ),
-          ),
-        ));
-      }
-      users.add(Positioned(
-        left: (task.assignedUser.length) * 20.0,
-        child: InkWell(
-          onTap: () {
-            assignedUser(context, boardId, columnId, task);
-          },
-          child: CircleAvatar(
-            radius: 14,
-            child: Icon(Icons.add),
-          ),
-        ),
-      ));
-    } else {
-      users.add(Positioned(
-        left: 20,
-        child: InkWell(
-          onTap: () {
-            assignedUser(context, boardId, columnId, task);
-          },
-          child: CircleAvatar(
-            radius: 14,
-            child: Icon(Icons.add),
-          ),
-        ),
-      ));
-    }
-
     showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
-            return AlertDialog(
-              titlePadding: EdgeInsets.all(8),
-              contentPadding: EdgeInsets.all(8),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
-              title: Text(
-                'Task Details',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    margin: EdgeInsets.symmetric(vertical: 4),
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.1),
-                          spreadRadius: 0.8,
-                          blurRadius: 8,
-                        )
-                      ],
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.all(8),
-                          child: Text(
-                            task.title,
-                            style: TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Divider(height: 1),
-                        if (task.description.isNotEmpty)
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 4, horizontal: 8),
-                            child: Text(
-                              task.description,
-                              style: TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.w400),
-                              maxLines: 3,
-                            ),
-                          ),
-                        Divider(height: 1),
-                        Padding(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                          child: Text(
-                            "created at : ${task.createdAt.toString().split(" ").first}",
-                            style: TextStyle(
-                                fontSize: 10, fontWeight: FontWeight.w500),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 8),
-                  if (task.assignedUser.isNotEmpty) Text("Assigned users"),
-                  Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      SizedBox(
-                        width: double.infinity,
-                      ),
-                      CircleAvatar(
+            return Consumer<BoardProvider>(
+              builder: (context, provider, child) {
+                final updatedTask =
+                    provider.getCardsByBoard(boardId).firstWhere(
+                          (c) => c.id == task.id,
+                          orElse: () => task,
+                        );
+                var users = <Widget>[];
+                if (updatedTask.assignedUser.length > 1) {
+                  for (int i = 1; i < updatedTask.assignedUser.length; i++) {
+                    users.add(Positioned(
+                      left: 20.0 * i,
+                      child: CircleAvatar(
                         radius: 14,
-                        backgroundColor: Colors.green,
+                        backgroundColor: Colors.white,
                         child: Center(
                           child: Text(
-                            task.assignedUser.first.substring(0, 1),
+                            updatedTask.assignedUser[i].substring(0, 1),
                             style: TextStyle(fontSize: 12),
                           ),
                         ),
                       ),
-                      ...users,
+                    ));
+                  }
+                  users.add(Positioned(
+                    left: (updatedTask.assignedUser.length) * 20.0,
+                    child: InkWell(
+                      onTap: () {
+                        assignedUser(context, boardId, columnId, updatedTask);
+                      },
+                      child: CircleAvatar(
+                        radius: 14,
+                        child: Icon(Icons.add),
+                      ),
+                    ),
+                  ));
+                } else {
+                  users.add(Positioned(
+                    left: 20,
+                    child: InkWell(
+                      onTap: () {
+                        assignedUser(context, boardId, columnId, updatedTask);
+                      },
+                      child: CircleAvatar(
+                        radius: 14,
+                        child: Icon(Icons.add),
+                      ),
+                    ),
+                  ));
+                }
+                return AlertDialog(
+                  titlePadding: EdgeInsets.all(8),
+                  contentPadding: EdgeInsets.all(8),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                  title: Text(
+                    'Task Details',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  content: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        margin: EdgeInsets.symmetric(vertical: 4),
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              spreadRadius: 0.8,
+                              blurRadius: 8,
+                            )
+                          ],
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.all(8),
+                              child: Text(
+                                updatedTask.title,
+                                style: TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Divider(height: 1),
+                            if (updatedTask.description.isNotEmpty)
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 4, horizontal: 8),
+                                child: Text(
+                                  updatedTask.description,
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400),
+                                  maxLines: 3,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      if (updatedTask.assignedUser.isNotEmpty)
+                        Text("Assigned users"),
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                          ),
+                          if (updatedTask.assignedUser.isNotEmpty)
+                            CircleAvatar(
+                              radius: 14,
+                              backgroundColor: Colors.green,
+                              child: Center(
+                                child: Text(
+                                  updatedTask.assignedUser.first
+                                      .substring(0, 1),
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                              ),
+                            ),
+                          ...users,
+                        ],
+                      )
                     ],
-                  )
-                ],
-              ),
+                  ),
+                );
+              },
             );
           },
         );
