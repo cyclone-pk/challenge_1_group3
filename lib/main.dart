@@ -4,6 +4,7 @@ import 'package:challenge1_group3/provider/user_provider.dart';
 import 'package:challenge1_group3/styling/custom_theme.dart';
 import 'package:challenge1_group3/ui/pages/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => UserProvider()),
       ],
       child: MaterialApp(
+        scrollBehavior: MyCustomScrollBehavior(),
         theme: ThemeData(
           scaffoldBackgroundColor: CustomTheme.white,
           primaryColor: CustomTheme.accentColor,
@@ -47,3 +49,11 @@ class MyApp extends StatelessWidget {
 }
 
 GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
+
+class MyCustomScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+      };
+}
